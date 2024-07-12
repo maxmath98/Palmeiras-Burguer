@@ -39,12 +39,11 @@
                             <img :src="maionese">
                             <img :src="hamburguer">
                             <img :src="pao[1]">
-
                         </div>
                     </div>
                 </div> <!-- FIM seção img -->
 
-                <div class="col-md-6">
+                <div class="col-md-6" v-if="etapa == 1">
 
                     <!-- TIPO do Pão -->
                     <div class="row mt-2">
@@ -72,21 +71,17 @@
                     <div class="row mt-2">
                         <div class="col">
                             <div class="card">
-
+<!-- TITULO - Salada  -->
                                 <div class="card-header">
                                     Salada
                                 </div>
-                                <!-- TITULO - Salada  -->
+                                <!-- Card Body Alface -->
                                  <div class="card-body">
-                                    <div class="form-check">
+                                    <div class="form-check form-check-inline">
                                         <input type="checkbox" class="form-check-input" value="alface" v-model="inputSalada">
                                         <label class="form-check-label"> Alface </label>
-
                                     </div>
-
                                  </div>
-
-                                <!-- Card Body Alface -->
                             </div>
                         </div>
                     </div> <!-- FIM SALADA -->
@@ -100,6 +95,7 @@
                                 <div class="card-header">
                                    Molhos
                                 </div>
+<!-- Card Body Tipos de Molhos -->
                                 <div class="card-body">
                                     <div class="form-check form-check-inline">
                                         <input type="checkbox" class="form-check-input" value="ketchup" v-model="inputMolhos">
@@ -115,11 +111,6 @@
                                     </div>
                                 </div>
 
-
-
-                                <!-- Card Body Tipos de Molhos -->
-
-
                             </div>
                         </div>
                     </div> <!--FIM MOLHOS -->
@@ -131,8 +122,9 @@
 
                                 <!-- TITULO - Tipos de Hamburguer -->
                                 <div class="card-header">
-                                    Molhos
+                                    Tipo de Hamburguer
                                  </div>
+<!-- Card Body Tipos de Hamburguer -->
                                  <div class="card-body">
                                      <div class="form-check form-check-inline">
                                          <input type="radio" class="form-check-input" value="bovino" v-model="inputHamburguer">
@@ -148,9 +140,6 @@
                                      </div>
                                  </div>
 
-                                <!-- Card Body Tipos de Hamburguer -->
-
-
                             </div>
                         </div>
                     </div> <!-- Fim Tipos Hamburguer -->
@@ -158,17 +147,37 @@
                     <!-- Fazer Pedido -->
                     <div class="row mt-2">
                         <!--     button    Fazer pedido    -->
+                        <div class="col d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary" @click="fazerPedido()">
+                                Fazer Pedido
+                             </button>
+                        </div>
                     </div>
                 </div> <!-- Fim col md -->
-
-                <div class="col-md-6">
+                    <!-- Etapa 2 -->
+                <div class="col-md-6" v-if="etapa == 2">
+                    <!-- diretiva p/ "renderização condicional" -->
                     <div class="row mt-2">
                         <div class="col">
                             <div class="card">
-
                                 <!-- Titulo Informe seus dados -->
-
+                                <div class="card-header"> Informe seus dados </div>
                                 <!-- card-body Informe seus dados -->
+                                <div class="card-body"> 
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            Nome
+                                        </label>
+                                        <input type="text" class="form-control" v-model="inputNome">
+
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            Endereço
+                                        </label>
+                                        <input type="text" class="form-control" v-model="inputEndereco">
+                                    </div>
+                                </div>
 
                             </div> <!--  FIM card -->
                         </div> <!-- col -->
@@ -176,8 +185,9 @@
 
                     <div class="row mt-2">
                         <div class="col d-flex justify-content-between">
-
                             <!-- Voltar para o Lanche  -->
+                            <button type="button" class="btn btn-warning" @click="etapa -= 1"> Voltar para o lanche </button>
+                            <button type="button" class="btn btn-success" @click="confirmarPedido()"> Confirmar </button>
 
                         </div>
                     </div>
@@ -190,6 +200,8 @@
                             <div class="card">
 
                                 <!--  PEDIDO CONFIRMADO -->
+                                <div class="card-header"> Pedido Confirmado </div>
+                                <div class="card-body"><p> Agora é só aguradar 10 minutos!</p><p> Iremos chamar você em breve. </p></div>
 
                             </div>
                         </div>
@@ -197,8 +209,9 @@
                     <!-- Repetir pedido -->
                     <div class="row mt-2">
                         <div class="col d-flex justify-content-between">
-
                             <!-- button Repetir Pedido -->
+                            <button type="button" class="btn btn-primary" @click="etapa = 1"> Repetir Pedido </button>
+                            <button type="button" class="btn btn-success" @click="novoPedido()"> Novo Pedido </button>
 
                         </div>
                     </div>
@@ -220,6 +233,10 @@
                 inputSalada: [],
                 inputMolhos: [],
                 inputHamburguer: '',
+                etapa: 1,
+                InputNome: '',
+                inputEndereco: '',
+                novoPedidoAssincrono: '',
             },
 
             computed: {
@@ -268,10 +285,50 @@
                         default:
                             return 'imagens/padrao/hamburguer.png'
                     }
-                  
+                                  },
+            },
+
+            methods: {
+                fazerPedido(){
+                    if(this.inputTipoPao && this.inputHamburguer){
+                        this.etapa = 2
+                    }
+                    else{
+                        alert('Selecione pelo menos o um tipo de pão e um tipo de carne.')
+                    }
                 },
+                confirmarPedido(){
+                    if(this.inputNome && this.inputEndereco){
+                        this.etapa = 3 
+                   
+                        this.novoPedidoAssincrono = setTimeout(() => this.novoPedido(), 5000)
+                    }
+                    else{
+                        alert('Você precisa informar seu nome e endereço.') 
+                    }
+                },
+                novoPedido(){
+                 this.etapa = 1
+
+                this.inputTipoPao = ''
+                this.inputSalada = []
+                this.inputMolhos = []
+                this.inputHamburguer = ''
+                this.inputNome = ''
+                this.inputEndereco = ''
+
+                
+                }
 
             },
+            watch: {
+                etapa(novoValor){
+                    if(novoValor == 1){
+                        clearTimeout(this.novoPedidoAssincrono)
+                    }
+                }
+            }
+
         })
 
     </script>
